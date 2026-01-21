@@ -2,73 +2,85 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Boss-Arena: Götterdämmerung 2026</title>
+    <title>Arena of Legends: Absolute 2026</title>
     <style>
         :root { --neon: #00f2ff; --gold: #f1c40f; --danger: #ff4757; }
-        body { margin: 0; background: #050505; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        canvas { display: block; margin: auto; background: radial-gradient(circle, #0f0f1f 0%, #000 100%); border-bottom: 4px solid var(--neon); }
+        body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        canvas { display: block; margin: auto; background: radial-gradient(circle, #0a0a1a 0%, #000 100%); }
+        
         .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-        .menu { background: rgba(10, 10, 20, 0.98); padding: 30px; border: 2px solid var(--neon); border-radius: 15px; text-align: center; min-width: 500px; pointer-events: auto; box-shadow: 0 0 50px rgba(0,0,0,1); z-index: 1000; }
-        button { background: #111; border: 1px solid var(--neon); color: var(--neon); padding: 12px 20px; cursor: pointer; margin: 5px; border-radius: 5px; font-weight: bold; transition: 0.2s; position: relative; }
-        button:hover { background: var(--neon); color: black; box-shadow: 0 0 15px var(--neon); }
+        .menu { background: rgba(5, 5, 15, 0.98); padding: 40px; border: 3px solid var(--neon); border-radius: 20px; text-align: center; min-width: 500px; pointer-events: auto; box-shadow: 0 0 60px rgba(0,242,255,0.3); }
+        
+        button { background: #111; border: 1px solid var(--neon); color: var(--neon); padding: 12px 24px; cursor: pointer; margin: 8px; border-radius: 8px; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        button:hover { background: var(--neon); color: #000; transform: scale(1.05); box-shadow: 0 0 20px var(--neon); }
+        
         .hidden { display: none !important; }
-        .hud { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-around; font-size: 22px; pointer-events: none; text-shadow: 2px 2px #000; }
-        select { background: #222; color: white; border: 1px solid var(--neon); padding: 8px; border-radius: 5px; }
+        
+        .hud { position: absolute; top: 0; width: 100%; padding: 20px; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+        .hp-container { width: 80%; height: 25px; background: rgba(255,255,255,0.1); border: 2px solid #fff; border-radius: 12px; overflow: hidden; margin-top: 10px; }
+        #boss-hp-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #ff4757, #ff6b81); transition: width 0.3s ease-out; }
+        
+        #coin-hud { position: absolute; top: 20px; right: 40px; font-size: 24px; color: var(--gold); font-weight: bold; }
+        select { background: #222; color: #fff; border: 1px solid var(--neon); padding: 10px; border-radius: 5px; font-size: 16px; }
     </style>
 </head>
 <body>
 
-    <div class="hud">
-        <div id="coin-display">🪙 Münzen: 0</div>
-        <div id="boss-info" style="color: var(--danger);">BOSS AKTIV</div>
+    <div class="hud" id="hud-layer">
+        <div id="boss-name" style="font-size: 20px; letter-spacing: 2px; text-transform: uppercase;">WÄHLE DEINEN GEGNER</div>
+        <div class="hp-container"><div id="boss-hp-fill"></div></div>
     </div>
+    <div id="coin-hud">🪙 0</div>
 
     <div class="ui-layer" id="ui-container">
-        <!-- HAUPTMENÜ / LOBBY -->
+        <!-- LOBBY -->
         <div id="lobby-menu" class="menu">
-            <h1 style="color: var(--neon); letter-spacing: 5px;">ARENA 2026</h1>
-            <button id="p2-toggle-btn">Modus: Einzelspieler</button>
-            <div style="display: flex; justify-content: space-around; margin: 20px 0;">
+            <h1 style="color: var(--neon); font-size: 42px; margin-top: 0;">ARENA 2026</h1>
+            <button id="p2-toggle">MODUS: 1 SPIELER</button>
+            
+            <div style="display: flex; justify-content: space-around; margin: 30px 0;">
                 <div>
-                    <label>BOSS:</label><br>
+                    <label>BOSS</label><br>
                     <select id="boss-select">
                         <option value="dragon">Plasma-Drache</option>
                         <option value="spider">Cyber-Spinne</option>
-                        <option value="titan">Kern-Titan</option>
-                        <option value="snake">Void-Schlange</option>
-                        <option value="golem">Frost-Golem</option>
+                        <option value="titan">Mechanischer Titan</option>
+                        <option value="wraith">Void-Gespenst</option>
+                        <option value="behemoth">Frost-Behemoth</option>
                     </select>
                 </div>
                 <div>
-                    <label>STUFE:</label><br>
+                    <label>SCHWIERIGKEIT</label><br>
                     <select id="diff-select">
                         <option value="1">Leicht</option>
                         <option value="2">Normal</option>
-                        <option value="3">Elite</option>
-                        <option value="4">Albtraum</option>
-                        <option value="6">Götterdämmerung</option>
+                        <option value="4">Elite</option>
+                        <option value="6">Albtraum</option>
+                        <option value="10">GÖTTERDÄMMERUNG</option>
                     </select>
                 </div>
             </div>
-            <div style="background: #111; padding: 10px; margin-bottom: 20px;">
-                Skills: <span id="s1-tag" style="color:var(--gold)">-</span> | <span id="s2-tag" style="color:var(--gold)">-</span>
-                <br><button id="open-shop-btn">Skill-Shop</button>
+
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <div id="equipped-skills">Slot 1: Feuerball | Slot 2: Blitz</div>
+                <button onclick="openShop()">ZUM SHOP</button>
             </div>
-            <button id="start-battle-btn" style="width: 100%; border-color: var(--gold); color: var(--gold); font-size: 20px;">KAMPF BEGINNEN</button>
+            
+            <button id="start-btn" style="width: 100%; border-color: var(--gold); color: var(--gold); font-size: 24px;">KAMPF STARTEN</button>
         </div>
 
         <!-- SHOP -->
         <div id="shop-menu" class="menu hidden">
-            <h2>SHOP / SKILLS</h2>
-            <div id="shop-items" style="max-height: 300px; overflow-y: auto;"></div>
-            <button id="close-shop-btn">Schließen</button>
+            <h2>FÄHIGKEITEN-SHOP</h2>
+            <div id="shop-items" style="max-height: 350px; overflow-y: auto; text-align: left;"></div>
+            <button onclick="closeShop()">ZURÜCK</button>
         </div>
 
         <!-- RESULT -->
         <div id="result-menu" class="menu hidden">
-            <h1 id="res-status">SIEG!</h1>
-            <p id="res-reward"></p>
-            <button id="back-to-lobby-btn">Zurück</button>
+            <h1 id="result-text">SIEG!</h1>
+            <p id="result-reward">Du hast 50 Münzen erhalten.</p>
+            <button onclick="location.reload()">LOBBY</button>
         </div>
     </div>
 
@@ -77,175 +89,275 @@
 <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = 1100; canvas.height = 650;
+    canvas.width = 1200;
+    canvas.height = 700;
 
-    let coins = parseInt(localStorage.getItem('arena_coins_2026')) || 0;
-    let ownedSkills = JSON.parse(localStorage.getItem('arena_skills_2026')) || ['Feuerball'];
+    // Spiel-Variablen
+    let coins = parseInt(localStorage.getItem('arena_26_coins')) || 0;
+    let ownedSkills = JSON.parse(localStorage.getItem('arena_26_skills')) || ['Feuerball', 'Blitz'];
     let equipped = ['Feuerball', 'Blitz'];
-    
-    const skillDB = {
-        'Feuerball': { cost: 0, power: 15, cd: 600, color: '#ff4400', type: 'attack' },
-        'Blitz': { cost: 100, power: 40, cd: 2000, color: '#00f2ff', type: 'attack' },
-        'Regeneration': { cost: 200, power: 12, cd: 15000, color: '#2ecc71', type: 'heal' },
-        'Meteor': { cost: 500, power: 100, cd: 8000, color: '#e67e22', type: 'attack' }
-    };
-
-    let p2Active = false;
-    let gameRunning = false;
+    let isP2 = false;
+    let running = false;
+    let keys = {};
     let players = [];
     let boss = null;
-    let projectiles = [];
-    let keys = {};
+    let particles = [];
+    let vfx = [];
 
-    // --- EVENT LISTENER FIX ---
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('p2-toggle-btn').onclick = () => {
-            p2Active = !p2Active;
-            document.getElementById('p2-toggle-btn').innerText = p2Active ? "Modus: 2 Spieler" : "Modus: Einzelspieler";
-        };
-        document.getElementById('open-shop-btn').onclick = showShop;
-        document.getElementById('close-shop-btn').onclick = hideShop;
-        document.getElementById('start-battle-btn').onclick = startBattle;
-        document.getElementById('back-to-lobby-btn').onclick = backToLobby;
-        updateLobbyHUD();
-    });
+    const skillData = {
+        'Feuerball': { cost: 0, dmg: 20, cd: 600, color: '#ff4500', type: 'projectile' },
+        'Blitz': { cost: 150, dmg: 45, cd: 2500, color: '#00f2ff', type: 'lightning' },
+        'Regeneration': { cost: 300, heal: 20, cd: 15000, color: '#2ecc71', type: 'heal' },
+        'Meteor': { cost: 800, dmg: 120, cd: 9000, color: '#e67e22', type: 'meteor' }
+    };
 
-    function showShop() { 
-        document.getElementById('lobby-menu').classList.add('hidden'); 
-        document.getElementById('shop-menu').classList.remove('hidden'); 
-        renderShop(); 
-    }
-    function hideShop() { 
-        document.getElementById('shop-menu').classList.add('hidden'); 
-        document.getElementById('lobby-menu').classList.remove('hidden'); 
-        updateLobbyHUD(); 
-    }
-    function backToLobby() { 
-        document.getElementById('result-menu').classList.add('hidden'); 
-        document.getElementById('lobby-menu').classList.remove('hidden'); 
+    // UI Handlers
+    document.getElementById('p2-toggle').onclick = () => {
+        isP2 = !isP2;
+        document.getElementById('p2-toggle').innerText = isP2 ? "MODUS: 2 SPIELER" : "MODUS: 1 SPIELER";
+    };
+
+    document.getElementById('start-btn').onclick = startBattle;
+
+    function openShop() {
+        document.getElementById('lobby-menu').classList.add('hidden');
+        document.getElementById('shop-menu').classList.remove('hidden');
+        renderShop();
     }
 
-    function updateLobbyHUD() {
-        document.getElementById('s1-tag').innerText = equipped[0];
-        document.getElementById('s2-tag').innerText = equipped[1];
-        document.getElementById('coin-display').innerText = `🪙 Münzen: ${coins}`;
+    function closeShop() {
+        document.getElementById('shop-menu').classList.add('hidden');
+        document.getElementById('lobby-menu').classList.remove('hidden');
     }
 
     function renderShop() {
         const container = document.getElementById('shop-items');
         container.innerHTML = '';
-        for(let key in skillDB) {
-            const skill = skillDB[key];
-            const owned = ownedSkills.includes(key);
-            const div = document.createElement('div');
-            div.style.padding = '10px'; div.style.borderBottom = '1px solid #333';
-            div.style.display = 'flex'; div.style.justifyContent = 'space-between';
-            div.innerHTML = `<span>${key}</span>`;
-            
-            const btnGroup = document.createElement('div');
-            if(owned) {
-                const s1 = document.createElement('button'); s1.innerText = "S1"; s1.onclick = () => equipped[0] = key;
-                const s2 = document.createElement('button'); s2.innerText = "S2"; s2.onclick = () => equipped[1] = key;
-                btnGroup.append(s1, s2);
-            } else {
-                const b = document.createElement('button'); b.innerText = `${skill.cost} 🪙`;
-                b.onclick = () => {
-                    if(coins >= skill.cost) {
-                        coins -= skill.cost; ownedSkills.push(key);
-                        localStorage.setItem('arena_coins_2026', coins);
-                        localStorage.setItem('arena_skills_2026', JSON.stringify(ownedSkills));
-                        renderShop(); updateLobbyHUD();
-                    }
-                };
-                btnGroup.append(b);
-            }
-            div.append(btnGroup); container.append(div);
+        for (let s in skillData) {
+            const owned = ownedSkills.includes(s);
+            container.innerHTML += `
+                <div style="border-bottom: 1px solid #333; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>${s}</span>
+                    <div>
+                        ${owned ? `<button onclick="equip('${s}', 0)">S1</button><button onclick="equip('${s}', 1)">S2</button>` : 
+                        `<button style="color:var(--gold)" onclick="buy('${s}')">${skillData[s].cost} 🪙</button>`}
+                    </div>
+                </div>`;
         }
+    }
+
+    function buy(name) {
+        if (coins >= skillData[name].cost) {
+            coins -= skillData[name].cost;
+            ownedSkills.push(name);
+            saveData(); renderShop(); updateHUD();
+        }
+    }
+
+    function equip(name, slot) {
+        equipped[slot] = name;
+        document.getElementById('equipped-skills').innerText = `Slot 1: ${equipped[0]} | Slot 2: ${equipped[1]}`;
+    }
+
+    function saveData() {
+        localStorage.setItem('arena_26_coins', coins);
+        localStorage.setItem('arena_26_skills', JSON.stringify(ownedSkills));
+    }
+
+    function updateHUD() {
+        document.getElementById('coin-hud').innerText = `🪙 ${coins}`;
+    }
+
+    // Boss Zeichnen-Funktionen (Prozedural)
+    function drawBoss(b) {
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.shadowBlur = 30;
+        ctx.shadowColor = b.color;
+        
+        const time = Date.now() / 1000;
+
+        if (b.type === 'dragon') {
+            ctx.fillStyle = b.color;
+            // Körper
+            ctx.beginPath(); ctx.ellipse(0, 0, 60, 40, 0, 0, Math.PI*2); ctx.fill();
+            // Flügel
+            ctx.beginPath();
+            ctx.moveTo(-40, 0); ctx.lineTo(-120, -50 + Math.sin(time*5)*30); ctx.lineTo(-40, 40); ctx.fill();
+            ctx.moveTo(40, 0); ctx.lineTo(120, -50 + Math.sin(time*5)*30); ctx.lineTo(40, 40); ctx.fill();
+        } else if (b.type === 'spider') {
+            ctx.strokeStyle = b.color; ctx.lineWidth = 6;
+            for(let i=0; i<8; i++) {
+                const angle = (i * Math.PI / 4) + Math.sin(time*10 + i)*0.2;
+                ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(angle)*100, Math.sin(angle)*100); ctx.stroke();
+            }
+            ctx.fillStyle = "#111"; ctx.beginPath(); ctx.arc(0,0, 45, 0, Math.PI*2); ctx.fill();
+        } else if (b.type === 'titan') {
+            ctx.strokeStyle = b.color; ctx.lineWidth = 4;
+            ctx.rotate(time);
+            ctx.strokeRect(-60, -60, 120, 120);
+            ctx.rotate(-time * 2);
+            ctx.strokeRect(-40, -40, 80, 80);
+            ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(0,0, 15, 0, Math.PI*2); ctx.fill();
+        } else if (b.type === 'wraith') {
+            ctx.globalAlpha = 0.6 + Math.sin(time*4)*0.2;
+            ctx.fillStyle = b.color;
+            ctx.beginPath(); ctx.moveTo(-50, 80); ctx.lineTo(0, -80); ctx.lineTo(50, 80); ctx.closePath(); ctx.fill();
+        } else {
+            ctx.fillStyle = "#fff"; ctx.fillRect(-70, -70, 140, 140);
+        }
+        
+        ctx.restore();
     }
 
     function startBattle() {
         const type = document.getElementById('boss-select').value;
         const diff = parseInt(document.getElementById('diff-select').value);
-        players = [{ x: 400, y: 500, hp: 100, max: 100, id: 1, color: '#00f2ff', cd1: 0, cd2: 0 }];
-        if(p2Active) players.push({ x: 700, y: 500, hp: 100, max: 100, id: 2, color: '#ff00ff', cd1: 0, cd2: 0 });
-        boss = { type, x: 550, y: 200, hp: (500 + diff * 500), max: (500 + diff * 500), diff, attackTimer: 0 };
-        projectiles = []; gameRunning = true;
+        
+        running = true;
         document.getElementById('ui-container').classList.add('hidden');
-        requestAnimationFrame(loop);
-    }
+        document.getElementById('boss-name').innerText = type.toUpperCase();
+        
+        players = [{ id: 1, x: 400, y: 550, hp: 100, color: '#00f2ff', cd: [0, 0] }];
+        if (isP2) players.push({ id: 2, x: 800, y: 550, hp: 100, color: '#ff00ff', cd: [0, 0] });
+        
+        boss = {
+            type, x: 600, y: 200, 
+            hp: (500 + diff * 500), maxHp: (500 + diff * 500),
+            color: type === 'dragon' ? '#ff4757' : (type === 'spider' ? '#9b59b6' : '#f1c40f'),
+            diff
+        };
 
-    function loop() { if(!gameRunning) return; update(); draw(); requestAnimationFrame(loop); }
-
-    function update() {
-        players.forEach(p => {
-            if(p.hp <= 0) return;
-            if(p.id === 1) {
-                if(keys['KeyA'] && p.x > 30) p.x -= 7; if(keys['KeyD'] && p.x < canvas.width-30) p.x += 7;
-                if(keys['KeyW'] && p.y > 350) p.y -= 7; if(keys['KeyS'] && p.y < canvas.height-30) p.y += 7;
-                if(keys['KeyF']) useSkill(p, 0); if(keys['KeyG']) useSkill(p, 1);
-            } else {
-                if(keys['ArrowLeft'] && p.x > 30) p.x -= 7; if(keys['ArrowRight'] && p.x < canvas.width-30) p.x += 7;
-                if(keys['ArrowUp'] && p.y > 350) p.y -= 7; if(keys['ArrowDown'] && p.y < canvas.height-30) p.y += 7;
-                if(keys['KeyK']) useSkill(p, 0); if(keys['KeyL']) useSkill(p, 1);
-            }
-        });
-
-        boss.x += Math.sin(Date.now()/1000) * 3;
-        boss.attackTimer++;
-        if(boss.attackTimer > 100 / boss.diff) {
-            const target = players[Math.floor(Math.random()*players.length)];
-            const angle = Math.atan2(target.y - boss.y, target.x - boss.x);
-            projectiles.push({ x: boss.x, y: boss.y, vx: Math.cos(angle)*5, vy: Math.sin(angle)*5, type: 'boss', color: 'red' });
-            boss.attackTimer = 0;
-        }
-
-        for(let i=projectiles.length-1; i>=0; i--) {
-            let pr = projectiles[i]; pr.x += pr.vx || 0; pr.y += pr.vy || -8;
-            if(pr.type === 'player') { if(Math.hypot(pr.x - boss.x, pr.y - boss.y) < 60) { boss.hp -= pr.dmg; projectiles.splice(i, 1); } }
-            else { players.forEach(p => { if(p.hp > 0 && Math.hypot(p.x - pr.x, p.y - pr.y) < 25) { p.hp -= 10 * boss.diff; projectiles.splice(i, 1); } }); }
-        }
-        if(boss.hp <= 0) endBattle(true);
-        if(players.every(p => p.hp <= 0)) endBattle(false);
+        vfx = [];
+        requestAnimationFrame(gameLoop);
     }
 
     function useSkill(p, slot) {
-        const skill = skillDB[equipped[slot]]; const now = Date.now();
-        if(slot === 0 && now < p.cd1) return; if(slot === 1 && now < p.cd2) return;
-        if(skill.type === 'attack') projectiles.push({ x: p.x, y: p.y, dmg: skill.power, type: 'player', color: skill.color });
-        if(skill.type === 'heal') p.hp = Math.min(p.max, p.hp + skill.power);
-        if(slot === 0) p.cd1 = now + skill.cd; else p.cd2 = now + skill.cd;
+        const now = Date.now();
+        if (now < p.cd[slot]) return;
+        
+        const skill = skillData[equipped[slot]];
+        p.cd[slot] = now + skill.cd;
+
+        if (skill.type === 'projectile') {
+            vfx.push({ x: p.x, y: p.y, vy: -10, dmg: skill.dmg, color: skill.color, type: 'orb' });
+        } else if (skill.type === 'lightning') {
+            vfx.push({ x: boss.x + (Math.random()-0.5)*100, y: 0, targetY: boss.y, dmg: skill.dmg, type: 'bolt', life: 20 });
+        } else if (skill.type === 'heal') {
+            p.hp = Math.min(100, p.hp + skill.heal);
+            vfx.push({ x: p.x, y: p.y, type: 'sparkle', life: 30, color: '#2ecc71' });
+        } else if (skill.type === 'meteor') {
+            vfx.push({ x: p.x, y: -100, tx: boss.x, ty: boss.y, dmg: skill.dmg, type: 'meteor', speed: 8 });
+        }
     }
 
-    function endBattle(win) {
-        gameRunning = false; coins += win ? 100 * boss.diff : 10;
-        localStorage.setItem('arena_coins_2026', coins);
-        document.getElementById('ui-container').classList.remove('hidden');
-        document.getElementById('result-menu').classList.remove('hidden');
-        document.getElementById('res-status').innerText = win ? "SIEG!" : "NIEDERLAGE";
-        document.getElementById('res-reward').innerText = `Belohnung: ${win ? 100*boss.diff : 10} Münzen`;
-        updateLobbyHUD();
+    function gameLoop() {
+        if (!running) return;
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+
+    function update() {
+        // Spielersteuerung
+        players.forEach(p => {
+            if (p.hp <= 0) return;
+            if (p.id === 1) {
+                if (keys['KeyA'] && p.x > 30) p.x -= 8;
+                if (keys['KeyD'] && p.x < canvas.width-30) p.x += 8;
+                if (keys['KeyW'] && p.y > 400) p.y -= 8;
+                if (keys['KeyS'] && p.y < canvas.height-30) p.y += 8;
+                if (keys['KeyF']) useSkill(p, 0);
+                if (keys['KeyG']) useSkill(p, 1);
+            } else {
+                if (keys['ArrowLeft'] && p.x > 30) p.x -= 8;
+                if (keys['ArrowRight'] && p.x < canvas.width-30) p.x += 8;
+                if (keys['ArrowUp'] && p.y > 400) p.y -= 8;
+                if (keys['ArrowDown'] && p.y < canvas.height-30) p.y += 8;
+                if (keys['KeyK']) useSkill(p, 0);
+                if (keys['KeyL']) useSkill(p, 1);
+            }
+        });
+
+        // Boss-Bewegung & Projektile
+        boss.x += Math.sin(Date.now()/700) * (5 * boss.diff);
+        if (Math.random() < 0.03 * boss.diff) {
+            vfx.push({ x: boss.x, y: boss.y, vy: 5 + boss.diff, type: 'enemy_orb', color: '#fff' });
+        }
+
+        // VFX & Kollision
+        for (let i = vfx.length - 1; i >= 0; i--) {
+            let v = vfx[i];
+            if (v.type === 'orb') {
+                v.y += v.vy;
+                if (Math.hypot(v.x - boss.x, v.y - boss.y) < 80) { boss.hp -= v.dmg; vfx.splice(i, 1); }
+            } else if (v.type === 'bolt') {
+                v.life--; if (v.life === 10) boss.hp -= v.dmg;
+                if (v.life <= 0) vfx.splice(i, 1);
+            } else if (v.type === 'enemy_orb') {
+                v.y += v.vy;
+                players.forEach(p => {
+                    if (p.hp > 0 && Math.hypot(v.x - p.x, v.y - p.y) < 25) { p.hp -= 10; vfx.splice(i, 1); }
+                });
+            } else if (v.type === 'meteor') {
+                v.y += v.speed; v.x += (v.tx - v.x) * 0.05;
+                if (v.y >= v.ty) { boss.hp -= v.dmg; vfx.splice(i, 1); }
+            }
+            if (v.y < -200 || v.y > canvas.height + 200) vfx.splice(i, 1);
+        }
+
+        // HP Anzeige
+        document.getElementById('boss-hp-fill').style.width = (boss.hp / boss.maxHp * 100) + "%";
+
+        if (boss.hp <= 0) finish(true);
+        if (players.every(p => p.hp <= 0)) finish(false);
     }
 
     function draw() {
-        ctx.clearRect(0,0, canvas.width, canvas.height);
-        ctx.save(); ctx.translate(boss.x, boss.y); ctx.shadowBlur = 25; ctx.shadowColor = "red";
-        if(boss.type === 'dragon') { ctx.fillStyle = "#ff4444"; ctx.fillRect(-40, -40, 80, 80); }
-        else if(boss.type === 'spider') { ctx.fillStyle = "#00f2ff"; ctx.beginPath(); ctx.arc(0,0, 40, 0, Math.PI*2); ctx.fill(); }
-        else if(boss.type === 'titan') { ctx.strokeStyle = "#f1c40f"; ctx.lineWidth=5; ctx.strokeRect(-50,-50,100,100); }
-        else if(boss.type === 'snake') { ctx.fillStyle = "#9b59b6"; ctx.beginPath(); ctx.ellipse(0,0,60,30,0,0,Math.PI*2); ctx.fill(); }
-        else { ctx.fillStyle = "#81d4fa"; ctx.fillRect(-60,-60,120,120); }
-        ctx.restore();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        drawBoss(boss);
 
+        // Spieler
         players.forEach(p => {
-            if(p.hp <= 0) return; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 20, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = "#ff4444"; ctx.fillRect(p.x-20, p.y+25, 40, 5); ctx.fillStyle = "#2ecc71"; ctx.fillRect(p.x-20, p.y+25, (p.hp/p.max)*40, 5);
+            if (p.hp <= 0) return;
+            ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 20, 0, Math.PI*2); ctx.fill();
+            // HP Balken unter Spieler
+            ctx.fillStyle = "#333"; ctx.fillRect(p.x-20, p.y+30, 40, 6);
+            ctx.fillStyle = "#2ecc71"; ctx.fillRect(p.x-20, p.y+30, (p.hp/100)*40, 6);
         });
-        projectiles.forEach(pr => { ctx.fillStyle = pr.color; ctx.beginPath(); ctx.arc(pr.x, pr.y, 10, 0, Math.PI*2); ctx.fill(); });
+
+        // Effekte
+        vfx.forEach(v => {
+            if (v.type === 'orb') {
+                ctx.fillStyle = v.color; ctx.beginPath(); ctx.arc(v.x, v.y, 10, 0, Math.PI*2); ctx.fill();
+            } else if (v.type === 'bolt') {
+                ctx.strokeStyle = "#fff"; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.moveTo(v.x, 0); ctx.lineTo(v.x + (Math.random()-0.5)*20, v.targetY); ctx.stroke();
+            } else if (v.type === 'enemy_orb') {
+                ctx.fillStyle = "#fff"; ctx.shadowBlur = 10; ctx.shadowColor = "white";
+                ctx.beginPath(); ctx.arc(v.x, v.y, 8, 0, Math.PI*2); ctx.fill();
+            } else if (v.type === 'meteor') {
+                ctx.fillStyle = "#e67e22"; ctx.beginPath(); ctx.arc(v.x, v.y, 25, 0, Math.PI*2); ctx.fill();
+            }
+        });
+        ctx.shadowBlur = 0;
     }
 
-    window.addEventListener('keydown', e => keys[e.code] = true);
-    window.addEventListener('keyup', e => keys[e.code] = false);
+    function finish(victory) {
+        running = false;
+        const reward = victory ? (50 * boss.diff) : 5;
+        coins += reward; saveData();
+        document.getElementById('result-menu').classList.remove('hidden');
+        document.getElementById('result-text').innerText = victory ? "SIEG!" : "NIEDERLAGE";
+        document.getElementById('result-reward').innerText = `Gewinn: ${reward} Münzen`;
+        updateHUD();
+    }
+
+    window.onkeydown = e => keys[e.code] = true;
+    window.onkeyup = e => keys[e.code] = false;
+    updateHUD();
 </script>
 </body>
 </html>
-
